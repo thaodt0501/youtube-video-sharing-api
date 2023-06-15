@@ -6,6 +6,7 @@ import { RouterModule } from 'nest-router';
 import routes from './routers';
 import { OpenaiModule } from './openai/openai.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +19,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     RouterModule.forRoutes(routes()),
     ExampleModule,
     OpenaiModule,
+    AuthModule
   ],
   providers: [],
 })
