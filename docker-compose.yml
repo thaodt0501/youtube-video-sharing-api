@@ -1,19 +1,19 @@
-version: "3.7"
+version: "3.3"
 services:
-  api:
-    image: registry.git.vmo.dev/c11/d3c22173-d3c-it/d3c22173_backend:latest
-    container_name: d3c22173_backend
-    restart: always
-    volumes:
-      - $HOME/.env:/usr/src/app/.env
-    env_file:
-      - .env
-    networks:
-      - d3c22173-network
-    ports:
-      - 8000:8000
-    depends_on:
-      - mongo
+  # api:
+  #   image: registry.git.vmo.dev/c11/d3c22173-d3c-it/d3c22173_backend:latest
+  #   container_name: d3c22173_backend
+  #   restart: always
+  #   volumes:
+  #     - $HOME/.env:/usr/src/app/.env
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - d3c22173-network
+  #   ports:
+  #     - 8000:8000
+  #   depends_on:
+  #     - mongo
   mongo:
     image: mongo:latest
     container_name: mongo
@@ -21,13 +21,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
-      MONGODB_DATABASE: skydust
+      MONGODB_DATABASE: usa
     networks:
-      - d3c22173-network
+      - usa-network
     ports:
       - 27017:27017
     volumes:
       - ./data:/data/db
 networks:
-  d3c22173-network:
+  usa-network:
     driver: bridge
