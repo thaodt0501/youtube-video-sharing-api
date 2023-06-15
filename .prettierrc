@@ -1,0 +1,7 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "scripts": {
+    "format": "prettier --write"
+  }
+}

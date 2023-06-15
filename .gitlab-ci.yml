@@ -1,0 +1,97 @@
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+stages:
+  - build
+  - deploy2dev
+  - deploy2prod
+
+build:
+  stage: build
+  image:
+    name: docker:20.10.16
+  services:
+    - name: docker:20.10.16-dind
+      alias: docker
+      command:
+        - "--tls=false"
+
+  before_script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#    - mkdir -p /kaniko/.docker
+#    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA} -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA} 
+    - docker push $CI_REGISTRY_IMAGE:latest
+#     - >-
+#      /kaniko/executor
+#      --context "${CI_PROJECT_DIR}"
+#      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+#      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+  only:
+    - dev
+    - prod
+  tags:
+    - vmogroup
+
+deploy2dev:
+  stage: deploy2dev
+  image:
+    name: ubuntu:20.04
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_DEV"
+    - echo "$SSH_PRIVATE_KEY_DEV" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan 18.138.31.161 >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts 
+  script:
+    - ls -la
+    - scp -o StrictHostKeyChecking=no -r docker-compose.yml ubuntu@18.138.31.161:/home/ubuntu/docker-compose.yml
+    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "yes | docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "yes | docker-compose -f /home/ubuntu/docker-compose.yml down "
+    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "yes | docker system prune -a "
+    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "yes | docker-compose -f /home/ubuntu/docker-compose.yml up -d "
+  
+  only:
+    - dev
+  tags:
+    - vmogroup
+
+deploy2prod:
+  stage: deploy2prod
+  image:
+    name: ubuntu:20.04
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_PROD"
+    - echo "$SSH_PRIVATE_KEY_PROD" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan 20.224.70.12 >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts 
+  script:
+    - ls -la
+    - scp -o StrictHostKeyChecking=no -r docker-compose.yml azureuser@20.224.70.12:/home/azureuser/docker-compose.yml
+    - ssh -o StrictHostKeyChecking=no azureuser@20.224.70.12 "yes | docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - ssh -o StrictHostKeyChecking=no azureuser@20.224.70.12 "yes | docker-compose -f /home/azureuser/docker-compose.yml down "
+    - ssh -o StrictHostKeyChecking=no azureuser@20.224.70.12 "yes | docker system prune -a "
+    - ssh -o StrictHostKeyChecking=no azureuser@20.224.70.12 "yes | docker-compose -f /home/azureuser/docker-compose.yml up -d "
+  
+  only:
+    - prod
+  tags:
+    - vmogroup
+
+#  script:
+#    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "yes | docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"    
+#    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "yes | docker system prune -a "
+#    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "if ( docker ps | grep d3c22173-backend ); then docker stop d3c22173-backend && docker rm d3c22173-backend ; fi"
+#    - ssh -o StrictHostKeyChecking=no ubuntu@18.138.31.161 "docker run -d -v $HOME/.env:/usr/src/app/.env -p 8000:8000 --name d3c22173-backend $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
