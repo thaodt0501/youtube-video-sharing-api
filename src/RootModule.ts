@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { VideoModule } from './video/video.module';
+import { EventsGateway } from './events/events.gateway';
 
 @Module({
   imports: [
@@ -16,21 +17,17 @@ import { VideoModule } from './video/video.module';
       isGlobal: true,
       load: [configuration],
     }),
-    JwtModule.register({
-      secret: 'yourSecretKey',  // Replace this with your own secret key
-      signOptions: { expiresIn: '1h' },  // Token will expire in 1 hour
-    }),
     MongooseModule.forRoot(process.env.MONGODB_URI, {
       dbName: process.env.MONGODB_DATABASE_NAME,
     }),
     RouterModule.forRoutes(routes()),
     ExampleModule,
     UserModule,
-    VideoModule
-    // OpenaiModule,
+    VideoModule,
+    EventsGateway
 
 
   ],
-  providers: [],
+  providers: [EventsGateway],
 })
 export default class RootModule { }

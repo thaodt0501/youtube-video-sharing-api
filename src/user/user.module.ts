@@ -16,7 +16,7 @@ import { LocalStrategy } from '../auth/local.strategy';
     ]),
     JwtModule.register({
       secret: 'yourSecretKey',  // Replace this with your own secret key
-      signOptions: { expiresIn: '1h' },  // Token will expire in 1 hour
+      signOptions: { expiresIn: '24h' },  // Token will expire in 1 hour
     }),
   ],
   controllers: [UsersController],

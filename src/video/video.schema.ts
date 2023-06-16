@@ -16,6 +16,9 @@ export class Video {
 
   @Prop({ required: false })
   userId: string;
+
+  @Prop({ required: true })
+  sharedBy: string;
 }
 
 export const VideoSchema = SchemaFactory.createForClass(Video);
