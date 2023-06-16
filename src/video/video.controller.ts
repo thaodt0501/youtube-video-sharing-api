@@ -11,7 +11,10 @@ export class VideoController {
   // @UseGuards(AuthGuard('local'))
   @Post()
   async create(@Body() video: Video) {
-    return this.videoService.create(video);
+    const videoCreated = await this.videoService.create(video);
+    return {
+      video: videoCreated
+    }
   }
 
   @Get()

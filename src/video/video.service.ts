@@ -9,7 +9,7 @@ import { Model } from 'mongoose';
 export class VideoService {
   constructor(@InjectModel(Video.name) private videoModel: Model<VideoDocument>) { }
 
-  async create(createVideoDto: { title: string, description: string }): Promise<Video> {
+  async create(createVideoDto: { title: string, description: string, link: string }): Promise<Video> {
     const createdTask = new this.videoModel(createVideoDto);
     return createdTask.save();
   }

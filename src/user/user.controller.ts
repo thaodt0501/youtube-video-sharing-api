@@ -49,12 +49,14 @@ export class UsersController {
   @Get('profile')
   async getUser(@Request() req) {
     const user = await this.usersService.findOne(req.user.email);
+    const payload = { username: user.username, email: user.email };
     return {
       user: {
         username: user.username,
         email: user.email,
         bio: "",
-        image: ""
+        image: "",
+        token: this.jwtService.sign(payload),
       }
     }
   }
