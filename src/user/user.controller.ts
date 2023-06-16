@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UnauthorizedException, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, Get, Request, UseGuards, Response, HttpStatus } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -27,11 +27,11 @@ export class UsersController {
   }
 
   @Post('login')
-  async login(@Body('user') userData) {
+  async login(@Response() res, @Body('user') userData) {
     const user = await this.usersService.findOne(userData.email);
     if (user && await bcrypt.compare(userData.password, user.password)) {
       const payload = { username: user.username, email: user.email };
-      return {
+      return res.status(HttpStatus.OK).json({
         user: {
           username: user.username,
           email: user.email,
@@ -39,9 +39,13 @@ export class UsersController {
           bio: "",
           image: ""
         }
-      };
+      })
     } else {
-      throw new UnauthorizedException();
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        errors: {
+          "email or password": ["is invalid"]
+        }
+      })
     }
   }
 

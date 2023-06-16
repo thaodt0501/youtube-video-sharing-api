@@ -4,12 +4,11 @@ import configuration from './config/configuration';
 import { ExampleModule } from './example/example.module';
 import { RouterModule } from 'nest-router';
 import routes from './routers';
-import { OpenaiModule } from './openai/openai.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
-import { JwtModule } from '@nestjs/jwt';
 import { VideoModule } from './video/video.module';
 import { EventsGateway } from './events/events.gateway';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { EventsGateway } from './events/events.gateway';
     ExampleModule,
     UserModule,
     VideoModule,
-    EventsGateway
+    EventsModule
 
 
   ],

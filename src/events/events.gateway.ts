@@ -9,19 +9,25 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server } from 'socket.io';
 
-@WebSocketGateway(8081, {
+@WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
 export class EventsGateway {
   @WebSocketServer()
-  server;
+  server: Server;
 
-  @SubscribeMessage('events')
-  notifyVideoCreated(@MessageBody() data: any) {
-    this.server.sockets.emit("abc");
-    return from([1, 2, 3]).pipe(map(item => ({ event: 'videoCreated', data: item })));
+  // @SubscribeMessage('events')
+  // notifyVideoCreated(@MessageBody() data: any) {
+  //   this.server.emit("videoCreated", data);
+  //   console.log(`data`, data);
+  //   return from([1, 2, 3]).pipe(map(item => ({ event: 'videoCreated', data: item })));
+  // }
+
+  notifyVideoCreated(video: any) {
+    console.log(`data`, video);
+    this.server.emit('videoCreated', video);
   }
 
   @SubscribeMessage('identity')
