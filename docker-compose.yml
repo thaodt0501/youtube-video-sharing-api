@@ -2,21 +2,21 @@ version: "3.3"
 services:
   # api:
   #   image: registry.git.vmo.dev/c11/d3c22173-d3c-it/d3c22173_backend:latest
-  #   container_name: d3c22173_backend
+  #   container_name: usa_backend
   #   restart: always
   #   volumes:
   #     - $HOME/.env:/usr/src/app/.env
   #   env_file:
   #     - .env
   #   networks:
-  #     - d3c22173-network
+  #     - usa-network
   #   ports:
-  #     - 8000:8000
+  #     - 8080:8080
   #   depends_on:
   #     - mongo
   mongo:
     image: mongo:latest
-    container_name: mongo
+    container_name: usa_mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root

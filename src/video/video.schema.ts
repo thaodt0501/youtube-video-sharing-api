@@ -8,13 +8,13 @@ export class Video {
   @Prop({ required: true })
   link: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   title: string;
 
   @Prop({ required: false })
   description: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   userId: string;
 }
 

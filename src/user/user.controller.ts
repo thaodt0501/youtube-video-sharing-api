@@ -1,7 +1,10 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, Get, Request, UseGuards } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+// import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from '../auth/auth.guard';
+
 
 
 @Controller('users')
@@ -39,6 +42,20 @@ export class UsersController {
       };
     } else {
       throw new UnauthorizedException();
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  async getUser(@Request() req) {
+    const user = await this.usersService.findOne(req.user.email);
+    return {
+      user: {
+        username: user.username,
+        email: user.email,
+        bio: "",
+        image: ""
+      }
     }
   }
 }

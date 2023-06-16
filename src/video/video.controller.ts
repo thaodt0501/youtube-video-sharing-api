@@ -15,8 +15,12 @@ export class VideoController {
   }
 
   @Get()
-  async findAll(): Promise<Video[]> {
-    return this.videoService.findAll();
+  async findAll() {
+    const articles = await this.videoService.findAll();
+    return {
+      articles: articles,
+      articlesCount: 0
+    };
   }
 
   @Get(':id')
