@@ -16,8 +16,8 @@ import { EventsModule } from './events/events.module';
       isGlobal: true,
       load: [configuration],
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI, {
-      dbName: process.env.MONGODB_DATABASE_NAME,
+    MongooseModule.forRoot('mongodb://root:rootpassword@localhost:27017/nest?authSource=admin&readPreference=primary', {
+      dbName: 'usa',
     }),
     RouterModule.forRoutes(routes()),
     ExampleModule,
