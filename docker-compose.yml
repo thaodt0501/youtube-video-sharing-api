@@ -1,33 +1,35 @@
 version: "3.3"
 services:
-  # api:
-  #   image: registry.git.vmo.dev/c11/d3c22173-d3c-it/d3c22173_backend:latest
-  #   container_name: usa_backend
-  #   restart: always
-  #   volumes:
-  #     - $HOME/.env:/usr/src/app/.env
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - usa-network
-  #   ports:
-  #     - 8080:8080
-  #   depends_on:
-  #     - mongo
-  mongo:
-    image: mongo:latest
-    container_name: usa_mongo
+  api:
+    build: .
+    image: usa-api
+    container_name: usa_backend
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-      MONGODB_DATABASE: usa
+    volumes:
+      - $HOME/.env:/usr/src/app/.env
+    env_file:
+      - .env
     networks:
       - usa-network
     ports:
-      - 27017:27017
-    volumes:
-      - ./data:/data/db
+      - 8081:8081
+  # depends_on:
+  #   - mongo
+
+  # mongo:
+  #   image: mongo:latest
+  #   container_name: usa_mongo
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: rootpassword
+  #     MONGODB_DATABASE: usa
+  #   networks:
+  #     - usa-network
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - ./data:/data/db
 networks:
   usa-network:
     driver: bridge
